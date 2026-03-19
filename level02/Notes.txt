@@ -1,0 +1,12 @@
+Quand on se connecte en tant que level02 on voit un fichier :
+level02.pcap
+C'est un fichier de paquets a ouvrir sur WireShark
+en regardant les paquets on en voit un qui contient une data : "Password"
+Clique droit dessus -> Follow -> TCP Stream
+On peut ensuite voir ecrit : 'Password: ft_wandr...NDRel.L0L'
+Les caracteres ' . ' ont l'air d'etre des caracteres non printable, pour ca que c'est remplace par des points.
+Donc on change la data en format Hexa, et on peut voir que le caractere "." est egal a 7f.
+Si on regarde sur un tableau ascii > hex, on voit que 7F correspond a la touch de suppression (backspace)
+Donc on en deduit que la personne a ecrit "ft_wandr" et ensuite appuye 3 fois sur backspace.
+Si on refait la meme avec le point suivant, on obient : "ft_waNDReL0L"
+

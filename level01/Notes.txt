@@ -1,0 +1,16 @@
+En cherchant le premier flag on avait fait : cat /etc/passwd
+
+et on avait trouve un flag, dans la ligne "flag01"
+Donc bon, je l'ai pris, et evidemment il etait encode.
+
+J'ai test les trucs de bases, et a force j'ai compris le format du hash.
+13 caracteres, mix lettres/chiffres, salt 2 premiere cara, source /etc/passwd
+(historiquement unix stockaient les mdp dans etc/passwd, avec un algorithme ; DES crypt)
+
+Bref, c'etait un DES crypt (unix).
+
+J'ai repris mon attaque au dictionnaire MD5 d'un dernier CTF et je l'ai change
+pour que ca soit une attaque au dictionnaire DES (toujours via le rockyou.txt)
+
+Le resultat du script ;
+Password trouvé : abcdefg
