@@ -1,4 +1,4 @@
-On commence avec un executable "level09" et un fichier, contenant du binaire, "token" :
+On commence avec un programme "level09" et un fichier, contenant du binaire, "token" :
     f4kmm6p|=�p�n��DB�Du{��
 En donnant en parametre token a level09, on obtient :
     tpmhr
@@ -8,12 +8,12 @@ On utilise un decompilateur (Dogbolt) pour comprendre comment est code level09 :
 On comprend qu'il possede des protections (ptrace) empechant le reverse engineering (ex : gdb),
 et qu'il detecte les injections (LD_PRELOAD, qui est une variable d'environnement qui specifie
 quelles bibliotheques partagees seront chargees avec les programmes d'execution).
-Ou sinon, il s'agit d'un executable qui fait pour chaque caracteres : 
+Ou sinon, il s'agit d'un programme qui fait pour chaque caracteres :
 
     output[i] = input[i] + i
 
 Exemple : ABC -> ACE
-Cet executable est en realite un encodeur, place ici pour nous montrer comment le token
+Cet programme est en realite un encodeur, place ici pour nous montrer comment le token
 a ete encode.
 
 Il faut donc creer un decodeur qui va faire l'operation inverse (decryptor.py)

