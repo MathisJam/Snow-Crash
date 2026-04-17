@@ -1,0 +1,23 @@
+Le fichier php contient un code qui permet de remplacer des caracteres
+par des autres dans une string donne.
+On l'utilise en passant un fichier en argument, et il fera le remplacement dans
+ce qui est ecrit dans le fichier.
+
+Apres recherche j'ai vu que la fonction preg_replace pouvait avoir une faille
+si le "/e" etait utilise.
+C'est le cas dans notre fichier.
+Le "/e" dit d'interpreter le remplacement comme du code PHP.
+
+Donc apres quelques essais non concluant, j'ai essaye :
+echo '[x ${`getflag`}]' > /tmp/test
+./level06 /tmp/test
+
+Et surprise, ca marche.
+
+Il suffisait de match le regex du script "/(\[x (.*)\])/e"
+ca veut dire [x ...] donc on match le pattern [x ] et on rajoute
+ce qu'on veut interpreter > [x ${`getflag`}]
+On met dans une interpolation ${} pour forcer interpreter meme dans une string
+On utilise des backticks `` pour faire une execution shell
+
+et tada : wiok45aaoguiboiki2tuin6ub

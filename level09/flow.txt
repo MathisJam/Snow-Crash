@@ -13,7 +13,7 @@ Ou sinon, il s'agit d'un programme qui fait pour chaque caracteres :
     output[i] = input[i] + i
 
 Exemple : ABC -> ACE
-Cet programme est en realite un encodeur, place ici pour nous montrer comment le token
+Ce programme est en realite un encodeur, place ici pour nous montrer comment le token
 a ete encode.
 
 Il faut donc creer un decodeur qui va faire l'operation inverse (decryptor.py)

