@@ -1,0 +1,97 @@
+On commence avec un programme "level13", en le passant dans ghidra, on obtient ce main :
+
+    void main(void)
+
+    {
+    __uid_t _Var1;
+    undefined4 uVar2;
+    
+    _Var1 = getuid();
+    if (_Var1 != 0x1092) {
+        _Var1 = getuid();
+        printf("UID %d started us but we we expect %d\n",_Var1,0x1092);
+                        // WARNING: Subroutine does not return
+        exit(1);
+    }
+    uVar2 = ft_des("boe]!ai0FB@.:|L6l@A?>qJ}I");
+    printf("your token is %s\n",uVar2);
+    return;
+    }
+
+
+Il s'agit d'un programme qui va stocker l'uid de l'utilisateur dans une variable, 
+et check si celui ci correspond a 4242 (0x1092 en hexadecimal). 
+Si non, exit, si oui, renvoie le password.
+Notre uid actuel est 2013, on le sait en lancant level13:
+    UID 2013 started us but we we expect 4242
+
+Pour atteindre le flag, nous avons un principal probleme : l'uid qui ne match pas
+Si on ne le modifie pas, le main entrera dans la condition qui va nous exit() du programme
+Est-ce qu'il existe un moyen de changer la valeur d'une variable dans un programme?  
+Oui, en utilisant gdb (debuggeur C) :
+
+    gdb ./level13
+    disas main      // disassemble le main, un peu comme ghidra :
+
+        (gdb) disas main
+        Dump of assembler code for function main:
+            0x0804858c <+0>:	push   %ebp
+            0x0804858d <+1>:	mov    %esp,%ebp
+            0x0804858f <+3>:	and    $0xfffffff0,%esp
+            0x08048592 <+6>:	sub    $0x10,%esp
+            0x08048595 <+9>:	call   0x8048380 <getuid@plt>
+            0x0804859a <+14>:	cmp    $0x1092,%eax
+            0x0804859f <+19>:	je     0x80485cb <main+63>
+            0x080485a1 <+21>:	call   0x8048380 <getuid@plt>
+            0x080485a6 <+26>:	mov    $0x80486c8,%edx
+            0x080485ab <+31>:	movl   $0x1092,0x8(%esp)
+            0x080485b3 <+39>:	mov    %eax,0x4(%esp)
+            0x080485b7 <+43>:	mov    %edx,(%esp)
+            0x080485ba <+46>:	call   0x8048360 <printf@plt>
+            0x080485bf <+51>:	movl   $0x1,(%esp)
+            0x080485c6 <+58>:	call   0x80483a0 <exit@plt>
+            0x080485cb <+63>:	movl   $0x80486ef,(%esp)
+            0x080485d2 <+70>:	call   0x8048474 <ft_des>
+            0x080485d7 <+75>:	mov    $0x8048709,%edx
+            0x080485dc <+80>:	mov    %eax,0x4(%esp)
+            0x080485e0 <+84>:	mov    %edx,(%esp)
+            0x080485e3 <+87>:	call   0x8048360 <printf@plt>
+            0x080485e8 <+92>:	leave  
+            0x080485e9 <+93>:	ret    
+        End of assembler dump.
+
+Ces deux lignes nous interessent toute particulierement :
+    0x08048595 <+9>:	call   0x8048380 <getuid@plt>
+    0x0804859a <+14>:	cmp    $0x1092,%eax
+On comprend que la premiere correspond au premier appel(call) a la fonction getuid() == _Var1 = getuid();
+La seconde est la pour comparer(cmp) 4242($0x1092 en hexa) avec la valeur de $eax == if (_Var1 != 0x1092)
+On se rend donc compte que $eax est la variable dans laquelle est stocke l'uid!
+Mais comment est-ce qu'on change sa valeur maintenant?
+
+On va commencer par mettre un breakpoint, c'est-a-dire un point d'arret, a l'emplacement
+du premier appel a getuid().
+    break getuid
+Ca va nous permettre de nous arreter a cet emplacement lorsqu'on va parcourir le main :
+    run
+    step    // Permet de justement lancer le main etape par etape, et donc de nous arreter au premier getuid()
+
+On va verifier si la variable $eax a bien ete initialisee :
+    print $eax -> $1 = 2013
+Cela correspond bien a notre uid. Maintenant que l'on est au bon emplacement, on peut changer la valeur:
+    set $eax=4242
+    print $eax -> $2 = 4242
+    step
+On fini avec step pour parcourir le restant du main, qui va saute la condition et nous donner le password :
+
+
+password14 : g1qKMiRpXf53AWhDaU7FEkczr
+
+
+Etapes sans tout le blabla :
+    gdb .level13
+    (disas main)
+    break getuid
+    run
+    step
+    set $eax=4242
+    step
