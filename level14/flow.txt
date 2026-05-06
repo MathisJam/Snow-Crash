@@ -1,0 +1,40 @@
+On commence sans rien et sans indications
+Les find / -user flag14, level14 etc ne donnent rien.
+
+Apres discussions avec les collegues autour il faudrait exploiter un binaire/programme
+
+Le seul interessant qui pourrait nous aider etant getflag, donc :
+
+
+-> gdb getflag
+-> run
+
+On voit que il y a un message d'erreur et que ca nous bloque, on va essayer de bypass ca
+
+-> disas main
+
+Le programme appelle ptrace, un surveillant/controleur de processus pour autoriser ou non l'execution d'un processus dans un autre processus parent.
+En gros, ptrace ne veut pas qu'on lance getflag dans le processus gdb.
+
+Il y'a un moyen de bypass ca avec cette methode : https://gist.github.com/poxyran/71a993d292eee10e95b4ff87066ea8f2
+getflag appelle aussi getuid, on va donc essayer de se faire passer pour flag14.
+
+donc on va tester (et reussir) :
+
+-> id flag14 (recuperer le uid)
+
+-> gdb getflag
+-> catch syscall ptrace
+-> commands 1
+-> set $eax=3014
+-> continue
+-> end
+
+-> break getuid
+-> run
+-> step
+-> print $eax
+-> set $eax = 3014
+-> step
+
+Voila
